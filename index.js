@@ -57,6 +57,7 @@ app.get('/', (req, res) => {
 
 app.post('/register', async (req, res) => {
   const { yourName, email, password, reenterpassword } = req.body;
+  const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
   // Check if passwords match
   if (password !== reenterpassword) {
@@ -74,6 +75,14 @@ app.post('/register', async (req, res) => {
       return res.render('register', { error: 'Password must contain at least one letter and one number' });
   }
 
+
+
+  if (!/[a-zA-Z]/.test(yourName) || /\d/.test(yourName)) {
+  return res.render('register', { error: 'Name must not contain any numbers' });
+}
+
+  
+
   try {
     
     await user.create({
@@ -84,6 +93,7 @@ app.post('/register', async (req, res) => {
     });
 
     // If successful, you can redirect the user to a success page
+    res.redirect('/login.html');
     // res.redirect('/success'); // Replace with your actual success route
   } catch (error) {
     // Handle database or other errors here
