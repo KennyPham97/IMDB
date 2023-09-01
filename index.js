@@ -59,6 +59,12 @@ app.post('/register', async (req, res) => {
   const { yourName, email, password, reenterpassword } = req.body;
   const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
+    // // Check if the name contains a URL
+    // const urlRegex = /(https?:\/\/[^\s]+)/;
+    // if (urlRegex.test(yourName)) {
+    //   return res.render('register', { error: 'Name cannot contain a URL' });
+    // }
+
   // Check if passwords match
   if (password !== reenterpassword) {
     // Passwords don't match, render the 'register' view with the error message
