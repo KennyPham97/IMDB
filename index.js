@@ -1,4 +1,6 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
+
 const bodyParser = require('body-parser');
 const app = express();
 const { user } = require('./models');
@@ -57,13 +59,12 @@ app.get('/', (req, res) => {
 
 app.post('/register', async (req, res) => {
   const { yourName, email, password, reenterpassword } = req.body;
-  const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    // Check if the name contains a URL
+    const urlRegex = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;;
+    if (yourName == urlRegex) {
+      return res.render('register', { error: 'Name cannot contain a URL' });
+    }
 
-    // // Check if the name contains a URL
-    // const urlRegex = /(https?:\/\/[^\s]+)/;
-    // if (urlRegex.test(yourName)) {
-    //   return res.render('register', { error: 'Name cannot contain a URL' });
-    // }
 
   // Check if passwords match
   if (password !== reenterpassword) {
@@ -89,14 +90,16 @@ app.post('/register', async (req, res) => {
 
   
 
-  try {
-    
-    await user.create({
-      yourName: yourName,
-      email: email,
-      password: password,
-      reenterpassword: reenterpassword,
-    });
+try {
+  const saltRounds = 10; // Specify the number of salt rounds
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+  await user.create({
+    yourName: yourName,
+    email: email,
+    password: hashedPassword, // Store the hashed password in the database
+    reenterpassword: reenterpassword,
+  });
 
     // If successful, you can redirect the user to a success page
     res.redirect('/login.html');
